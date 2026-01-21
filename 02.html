@@ -1,537 +1,521 @@
-import React, { useState, useEffect } from 'react';
-import { BookOpen, Map, Clock, Shield, Anchor, Menu, X, CheckCircle, ChevronDown, ChevronUp, AlertCircle, Award, Home } from 'lucide-react';
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>독도 바로 알기 - 대한민국 동쪽 땅끝</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&display=swap');
+        body {
+            font-family: 'Noto Sans KR', sans-serif;
+            scroll-behavior: smooth;
+        }
+        .fade-in {
+            animation: fadeIn 0.5s ease-out forwards;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .hero-gradient {
+            background: linear-gradient(to bottom, rgba(37, 99, 235, 0.5), rgba(30, 58, 138, 0.9));
+        }
+        .timeline-dot::before {
+            content: '';
+            position: absolute;
+            left: -1.65rem;
+            top: 0.5rem;
+            width: 1.25rem;
+            height: 1.25rem;
+            background-color: #3b82f6;
+            border: 4px solid white;
+            border-radius: 50%;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        @media (min-width: 768px) {
+            .timeline-dot::before {
+                left: 50%;
+                margin-left: -0.625rem;
+            }
+        }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-800">
 
-const DokdoLearningHub = () => {
-  const [activeTab, setActiveTab] = useState('home');
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
-
-  const toggleMenu = () => setIsMenuOpen(!isMenuOpen);
-
-  const navItems = [
-    { id: 'home', label: '홈', icon: <Anchor size={20} /> },
-    { id: 'geography', label: '지리적 특성', icon: <Map size={20} /> },
-    { id: 'history', label: '역사와 증거', icon: <BookOpen size={20} /> },
-    { id: 'timeline', label: '역사 연대기', icon: <Clock size={20} /> },
-    { id: 'conflict', label: '갈등과 화해', icon: <Shield size={20} /> },
-  ];
-
-  const renderContent = () => {
-    switch (activeTab) {
-      case 'home': return <HomeSection setActiveTab={setActiveTab} />;
-      case 'geography': return <GeographySection />;
-      case 'history': return <HistorySection />;
-      case 'timeline': return <TimelineSection />;
-      case 'conflict': return <ConflictSection />;
-      default: return <HomeSection setActiveTab={setActiveTab} />;
-    }
-  };
-
-  return (
-    <div className="min-h-screen bg-slate-50 font-sans text-slate-800">
-      {/* Header */}
-      <header className="sticky top-0 z-50 bg-blue-900 text-white shadow-lg">
-        <div className="container mx-auto px-4 py-3 flex justify-between items-center">
-          <div className="flex items-center space-x-2 cursor-pointer" onClick={() => setActiveTab('home')}>
-            <span className="text-2xl font-bold tracking-tight">🇰🇷 독도 바로 알기</span>
-          </div>
-          
-          <div className="flex items-center gap-2">
-            {/* Desktop Nav */}
-            <nav className="hidden md:flex space-x-1">
-              {navItems.map((item) => (
-                <button
-                  key={item.id}
-                  onClick={() => setActiveTab(item.id)}
-                  className={`flex items-center space-x-1 px-4 py-2 rounded-lg transition-colors ${
-                    activeTab === item.id 
-                      ? 'bg-blue-700 text-white font-medium shadow-md' 
-                      : 'text-blue-100 hover:bg-blue-800 hover:text-white'
-                  }`}
-                >
-                  {item.icon}
-                  <span>{item.label}</span>
-                </button>
-              ))}
-            </nav>
-
-            {/* Home Link Button */}
-            <a 
-              href="index.html" 
-              className="p-2 text-blue-100 hover:bg-blue-800 hover:text-white rounded-lg transition-colors"
-              title="메인으로 이동"
-            >
-              <Home size={24} />
-            </a>
-
-            {/* Mobile Menu Button */}
-            <button className="md:hidden p-2" onClick={toggleMenu}>
-              {isMenuOpen ? <X size={24} /> : <Menu size={24} />}
-            </button>
-          </div>
-        </div>
-
-        {/* Mobile Nav */}
-        {isMenuOpen && (
-          <nav className="md:hidden bg-blue-800 px-4 py-2 space-y-2">
-            {navItems.map((item) => (
-              <button
-                key={item.id}
-                onClick={() => {
-                  setActiveTab(item.id);
-                  setIsMenuOpen(false);
-                }}
-                className={`w-full flex items-center space-x-2 px-4 py-3 rounded-lg text-left ${
-                  activeTab === item.id ? 'bg-blue-900 font-bold' : 'text-blue-100'
-                }`}
-              >
-                {item.icon}
-                <span>{item.label}</span>
-              </button>
-            ))}
-          </nav>
-        )}
-      </header>
-
-      {/* Main Content */}
-      <main className="container mx-auto px-4 py-8 mb-12">
-        {renderContent()}
-      </main>
-
-      {/* Footer */}
-      <footer className="bg-slate-800 text-slate-300 py-8">
-        <div className="container mx-auto px-4 text-center">
-          <p className="font-bold text-lg mb-2">대한민국 동쪽 땅끝, 독도</p>
-          <p className="text-sm opacity-80">경상북도 울릉군 울릉읍 독도리 1~96</p>
-          <div className="mt-4 text-xs text-slate-500">
-            Based on provided educational materials: 지리적 특성, 사료와 증거, 갈등과 화해
-          </div>
-        </div>
-      </footer>
-    </div>
-  );
-};
-
-/* --- Sub Components --- */
-
-const HomeSection = ({ setActiveTab }) => {
-  return (
-    <div className="space-y-12">
-      {/* Hero Banner */}
-      <div className="relative rounded-3xl overflow-hidden shadow-2xl bg-blue-800 text-white h-96 flex flex-col justify-center items-center text-center p-6">
-        <div className="absolute inset-0 bg-gradient-to-b from-blue-600/50 to-blue-900/90 z-10"></div>
-        {/* Abstract background representation */}
-        <div className="absolute inset-0 z-0 bg-[url('https://images.unsplash.com/photo-1548685913-fe67375a022d?q=80&w=2070&auto=format&fit=crop')] bg-cover bg-center opacity-40"></div>
-        
-        <div className="relative z-20 max-w-2xl">
-          <h1 className="text-4xl md:text-6xl font-extrabold mb-4 animate-fade-in-up">
-            독도, 우리의 자부심
-          </h1>
-          <p className="text-lg md:text-xl text-blue-100 mb-8 leading-relaxed">
-            독도는 지리적, 역사적, 국제법적으로<br/>
-            명백한 대한민국의 고유 영토입니다.
-          </p>
-          <button 
-            onClick={() => setActiveTab('geography')}
-            className="bg-yellow-400 text-blue-900 hover:bg-yellow-300 px-8 py-3 rounded-full font-bold text-lg transition-transform transform hover:scale-105 shadow-lg"
-          >
-            독도 알아보기
-          </button>
-        </div>
-      </div>
-
-      {/* Intro Cards */}
-      <div className="grid md:grid-cols-3 gap-6">
-        <InfoCard 
-          icon={<Map className="text-blue-600" size={32} />}
-          title="지리적 증거"
-          description="울릉도에서 독도까지는 87.4km로, 맑은 날 육안으로 볼 수 있습니다. 이는 독도가 울릉도의 부속 섬임을 지리적으로 증명합니다."
-          onClick={() => setActiveTab('geography')}
-        />
-        <InfoCard 
-          icon={<BookOpen className="text-blue-600" size={32} />}
-          title="역사적 기록"
-          description="세종실록지리지, 대한제국 칙령 제41호 등 수많은 고문헌과 지도가 독도가 한국의 영토임을 기록하고 있습니다."
-          onClick={() => setActiveTab('history')}
-        />
-        <InfoCard 
-          icon={<Shield className="text-blue-600" size={32} />}
-          title="평화적 해결"
-          description="감정적인 대응보다 정확한 지식과 논리를 바탕으로 독도 영유권의 정당성을 이해하는 것이 중요합니다."
-          onClick={() => setActiveTab('conflict')}
-        />
-      </div>
-
-      <QuizSection />
-    </div>
-  );
-};
-
-const GeographySection = () => {
-  return (
-    <div className="space-y-8 animate-fade-in">
-      <div className="text-center mb-8">
-        <h2 className="text-3xl font-bold text-slate-800 mb-2">독도의 지리적 특성</h2>
-        <p className="text-slate-600">독도는 단순한 섬이 아닌, 동해의 해상 거점이자 천연기념물입니다.</p>
-      </div>
-
-      <div className="grid md:grid-cols-2 gap-8">
-        <div className="bg-white rounded-2xl shadow-lg p-6 border-l-4 border-blue-500">
-          <h3 className="text-xl font-bold mb-4 flex items-center gap-2">
-            <Map size={24} className="text-blue-600" />
-            위치와 거리
-          </h3>
-          <ul className="space-y-4 text-slate-700">
-            <li className="flex justify-between items-center p-3 bg-blue-50 rounded-lg">
-              <span>울릉도에서 거리</span>
-              <span className="font-bold text-blue-700">87.4km</span>
-            </li>
-            <li className="flex justify-between items-center p-3 bg-slate-50 rounded-lg">
-              <span>일본 오키섬에서 거리</span>
-              <span className="font-bold text-slate-600">157.5km</span>
-            </li>
-          </ul>
-          <div className="mt-4 p-4 bg-yellow-50 text-yellow-800 rounded-lg text-sm">
-            💡 <strong>중요 포인트:</strong> 울릉도에서는 맑은 날 독도가 보이지만, 일본 오키섬에서는 보이지 않습니다. 이는 독도가 지리적으로 울릉도의 생활권에 속함을 의미합니다.
-          </div>
-        </div>
-
-        <div className="bg-white rounded-2xl shadow-lg p-6 border-l-4 border-green-500">
-          <h3 className="text-xl font-bold mb-4 flex items-center gap-2">
-            <Anchor size={24} className="text-green-600" />
-            구성과 주소
-          </h3>
-          <div className="space-y-3">
-            <p className="font-medium text-slate-800">주소: 경상북도 울릉군 울릉읍 독도리 1~96</p>
-            <div className="grid grid-cols-2 gap-2 mt-2">
-              <div className="bg-slate-100 p-3 rounded text-center">
-                <span className="block font-bold text-lg">동도</span>
-                <span className="text-xs text-slate-500">유인 등대, 경비대</span>
-              </div>
-              <div className="bg-slate-100 p-3 rounded text-center">
-                <span className="block font-bold text-lg">서도</span>
-                <span className="text-xs text-slate-500">주민 숙소</span>
-              </div>
+    <!-- Header -->
+    <header class="sticky top-0 z-50 bg-blue-900 text-white shadow-lg">
+        <div class="container mx-auto px-4 py-3 flex justify-between items-center">
+            <div class="flex items-center space-x-2 cursor-pointer" onclick="showSection('home')">
+                <span class="text-2xl font-bold tracking-tight">🇰🇷 독도 바로 알기</span>
             </div>
-            <p className="text-sm text-slate-600 mt-2">
-              동도와 서도 외에 89개의 부속 도서로 구성되어 있으며, <strong>천연기념물 제336호</strong>로 지정되어 보호받고 있습니다.
-            </p>
-          </div>
-        </div>
-      </div>
-
-      <div className="bg-blue-900 text-white rounded-2xl p-8 shadow-xl">
-        <h3 className="text-2xl font-bold mb-4">독도의 가치</h3>
-        <div className="grid md:grid-cols-3 gap-6">
-          <div className="bg-white/10 p-4 rounded-xl backdrop-blur-sm">
-            <h4 className="font-bold text-lg text-yellow-300 mb-2">경제적 가치</h4>
-            <p className="text-sm opacity-90">북쪽의 한류와 남쪽의 난류가 만나는 '조경수역'으로 황금어장을 형성합니다. 또한 차세대 에너지원인 '메탄하이드레이트'가 매장되어 있습니다.</p>
-          </div>
-          <div className="bg-white/10 p-4 rounded-xl backdrop-blur-sm">
-            <h4 className="font-bold text-lg text-green-300 mb-2">생태적 가치</h4>
-            <p className="text-sm opacity-90">화산 활동으로 형성된 독특한 지형과 경관을 자랑하며, 다양한 철새들의 중간 기착지이자 해양 생물의 서식지입니다.</p>
-          </div>
-          <div className="bg-white/10 p-4 rounded-xl backdrop-blur-sm">
-            <h4 className="font-bold text-lg text-blue-300 mb-2">군사/안보적 가치</h4>
-            <p className="text-sm opacity-90">동해의 한가운데 위치하여 해상 및 공중 교통의 요충지이며, 기상 상황과 해양 환경을 관측하는 중요한 기지 역할을 합니다.</p>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-};
-
-const HistorySection = () => {
-  const documents = [
-    {
-      title: "세종실록지리지 (1454년)",
-      content: "독도(우산)와 울릉도(무릉) 두 섬이 서로 거리가 멀지 않아 날씨가 맑으면 바라볼 수 있다고 기록했습니다. 이는 조선의 관찬서에서 독도를 우리 영토로 명시한 중요한 증거입니다."
-    },
-    {
-      title: "안용복 사건 (1693, 1696년)",
-      content: "조선의 어부 안용복은 일본으로 건너가 울릉도와 독도가 조선의 땅임을 주장하였고, 이에 일본 막부는 '울릉도 도해 금지령'을 내려 이를 인정했습니다."
-    },
-    {
-      title: "대한제국 칙령 제41호 (1900년)",
-      content: "고종 황제는 울릉도를 울도군으로 승격시키고, 관할 구역에 '석도(독도)'를 명시하여 근대 법령으로 독도 영유권을 세계에 공표했습니다."
-    },
-    {
-      title: "태정관 지령 (1877년)",
-      content: "일본의 최고 행정기관인 태정관이 '죽도(울릉도) 외 1도(독도)는 일본과 관계가 없다'고 내무성에 내린 지시입니다. 일본 스스로 독도가 자국 영토가 아님을 인정한 결정적 문서입니다."
-    }
-  ];
-
-  const names = [
-    { name: "우산도 (于山島)", desc: "삼국시대 우산국에서 유래한 독도의 옛 이름" },
-    { name: "석도 (石島)", desc: "1900년 대한제국 칙령에 등장. '돌섬'을 한자로 표기한 것" },
-    { name: "가지도 (可支島)", desc: "강치(가지어)가 많이 사는 섬이라는 뜻" },
-    { name: "독도 (獨島)", desc: "전라도 방언 '독섬(돌섬)'에서 유래하여 현재에 이름" }
-  ];
-
-  return (
-    <div className="space-y-10 animate-fade-in">
-      <div className="text-center">
-        <h2 className="text-3xl font-bold text-slate-800 mb-2">사료와 증거</h2>
-        <p className="text-slate-600">역사적 문헌과 지도는 독도가 한국의 땅임을 명백히 보여줍니다.</p>
-      </div>
-
-      <div className="grid md:grid-cols-2 gap-6">
-        {documents.map((doc, idx) => (
-          <div key={idx} className="bg-white p-6 rounded-xl shadow-md hover:shadow-lg transition-shadow border-t-4 border-blue-600">
-            <h3 className="text-xl font-bold mb-3 text-blue-900">{doc.title}</h3>
-            <p className="text-slate-600 leading-relaxed">{doc.content}</p>
-          </div>
-        ))}
-      </div>
-
-      <div className="bg-slate-100 rounded-2xl p-8">
-        <h3 className="text-2xl font-bold mb-6 text-center">독도 이름의 변천사</h3>
-        <div className="grid sm:grid-cols-2 md:grid-cols-4 gap-4">
-          {names.map((item, idx) => (
-            <div key={idx} className="bg-white p-4 rounded-lg shadow text-center">
-              <div className="text-lg font-bold text-blue-600 mb-2">{item.name}</div>
-              <div className="text-sm text-slate-500">{item.desc}</div>
-            </div>
-          ))}
-        </div>
-      </div>
-    </div>
-  );
-};
-
-const TimelineSection = () => {
-  const events = [
-    { year: "512", title: "이사부의 우산국 정복", desc: "신라 지증왕 13년, 이사부가 우산국을 복속하여 우리 역사에 편입됨." },
-    { year: "1454", title: "세종실록지리지 편찬", desc: "우산(독도)과 무릉(울릉도)이 강원도 울진현 소속임을 명시함." },
-    { year: "1693", title: "제1차 안용복 사건", desc: "안용복이 일본으로 납치되었다가 독도가 조선 땅임을 주장하고 돌아옴." },
-    { year: "1696", title: "제2차 안용복 사건", desc: "일본 막부가 '울릉도 도해 금지령'을 내려 조선 영토임을 확인." },
-    { year: "1785", title: "삼국접양지도 제작", desc: "일본 학자 하야시 시헤이가 독도를 조선과 같은 황색으로 칠하고 '조선의 것'이라 표기." },
-    { year: "1877", title: "태정관 지령", desc: "일본 최고 기관이 독도와 울릉도는 일본과 관계없음을 공식 인정." },
-    { year: "1900", title: "대한제국 칙령 제41호", desc: "독도(석도)를 울도군 관할 구역으로 명시하여 관보에 게재." },
-    { year: "1905", title: "일본의 불법 편입", desc: "러일전쟁 중 일본이 시마네현 고시 제40호를 통해 독도를 불법적으로 편입 시도." },
-    { year: "1946", title: "SCAPIN 제677호", desc: "연합국 최고사령부가 독도를 일본의 통치 및 행정 범위에서 제외함." },
-    { year: "1952", title: "평화선 선포", desc: "대한민국 정부가 인접 해양의 주권에 관한 대통령 선언(평화선)을 발표." },
-  ];
-
-  return (
-    <div className="max-w-4xl mx-auto animate-fade-in">
-      <div className="text-center mb-10">
-        <h2 className="text-3xl font-bold text-slate-800 mb-2">대한민국 독도 영유권의 역사</h2>
-        <p className="text-slate-600">512년 신라의 우산국 정복부터 현재에 이르기까지의 기록</p>
-      </div>
-
-      <div className="relative border-l-4 border-blue-200 ml-4 md:ml-0 space-y-8 pl-8 md:pl-0">
-        {events.map((event, idx) => (
-          <div key={idx} className="relative md:flex items-start group">
-            {/* Dot */}
-            <div className="absolute -left-[3.25rem] md:left-auto md:absolute md:left-1/2 md:-ml-3 mt-1.5 w-6 h-6 rounded-full border-4 border-white bg-blue-500 shadow-md z-10"></div>
             
-            {/* Content Left (Date for Desktop) */}
-            <div className="hidden md:block w-1/2 pr-12 text-right">
-              <span className="text-2xl font-bold text-blue-600 block">{event.year}</span>
-            </div>
+            <div class="flex items-center gap-2">
+                <!-- Desktop Nav -->
+                <nav class="hidden md:flex space-x-1" id="desktop-nav">
+                    <button onclick="showSection('home')" class="nav-btn active flex items-center space-x-1 px-4 py-2 rounded-lg transition-colors bg-blue-700 text-white shadow-md" data-id="home">
+                        <i class="fas fa-anchor"></i><span>홈</span>
+                    </button>
+                    <button onclick="showSection('geography')" class="nav-btn flex items-center space-x-1 px-4 py-2 rounded-lg transition-colors text-blue-100 hover:bg-blue-800 hover:text-white" data-id="geography">
+                        <i class="fas fa-map"></i><span>지리적 특성</span>
+                    </button>
+                    <button onclick="showSection('history')" class="nav-btn flex items-center space-x-1 px-4 py-2 rounded-lg transition-colors text-blue-100 hover:bg-blue-800 hover:text-white" data-id="history">
+                        <i class="fas fa-book-open"></i><span>역사와 증거</span>
+                    </button>
+                    <button onclick="showSection('timeline')" class="nav-btn flex items-center space-x-1 px-4 py-2 rounded-lg transition-colors text-blue-100 hover:bg-blue-800 hover:text-white" data-id="timeline">
+                        <i class="fas fa-clock"></i><span>역사 연대기</span>
+                    </button>
+                    <button onclick="showSection('conflict')" class="nav-btn flex items-center space-x-1 px-4 py-2 rounded-lg transition-colors text-blue-100 hover:bg-blue-800 hover:text-white" data-id="conflict">
+                        <i class="fas fa-shield-halved"></i><span>갈등과 화해</span>
+                    </button>
+                </nav>
 
-            {/* Content Right (Mobile Layout / Card for Desktop) */}
-            <div className="w-full md:w-1/2 md:pl-12">
-              <div className="md:hidden text-xl font-bold text-blue-600 mb-1">{event.year}</div>
-              <div className="bg-white p-5 rounded-xl shadow-sm border border-slate-100 group-hover:shadow-md transition-shadow">
-                <h3 className="font-bold text-lg text-slate-800 mb-2">{event.title}</h3>
-                <p className="text-slate-600 text-sm">{event.desc}</p>
-              </div>
-            </div>
-          </div>
-        ))}
-      </div>
-    </div>
-  );
-};
+                <a href="index.html" class="p-2 text-blue-100 hover:bg-blue-800 hover:text-white rounded-lg transition-colors" title="메인으로 이동">
+                    <i class="fas fa-home text-xl"></i>
+                </a>
 
-const ConflictSection = () => {
-  return (
-    <div className="space-y-12 animate-fade-in">
-      <div className="text-center">
-        <h2 className="text-3xl font-bold text-slate-800 mb-2">갈등과 화해</h2>
-        <p className="text-slate-600">올바른 역사 인식을 통한 평화적 해결을 모색합니다.</p>
-      </div>
-
-      <div className="grid md:grid-cols-2 gap-8">
-        {/* Issue Card */}
-        <div className="bg-red-50 p-6 rounded-2xl border border-red-100">
-          <div className="flex items-center gap-3 mb-4">
-            <AlertCircle className="text-red-600" size={28} />
-            <h3 className="text-xl font-bold text-red-900">주요 갈등: 다케시마의 날</h3>
-          </div>
-          <p className="text-slate-700 mb-4">
-            일본 시마네현은 1905년 2월 22일 독도를 불법적으로 편입한 것을 기념하여, 2005년부터 매년 2월 22일을 '다케시마의 날'로 제정해 행사를 진행하고 있습니다.
-          </p>
-          <p className="text-slate-700">
-            이는 명백한 역사 왜곡이며, 대한민국의 영유권을 침해하는 행위입니다. 일본 교과서에도 독도 관련 왜곡된 기술이 증가하고 있어 양국 간의 갈등이 지속되고 있습니다.
-          </p>
-        </div>
-
-        {/* Resolution Card */}
-        <div className="bg-blue-50 p-6 rounded-2xl border border-blue-100">
-          <div className="flex items-center gap-3 mb-4">
-            <CheckCircle className="text-blue-600" size={28} />
-            <h3 className="text-xl font-bold text-blue-900">평화적 해결을 위한 노력</h3>
-          </div>
-          <p className="text-slate-700 mb-4">
-            단순히 '우리 땅'이라는 감정적 대응보다는, <strong>정확한 지식과 논리</strong>를 바탕으로 독도 영유권의 정당성을 이해하는 것이 중요합니다.
-          </p>
-          <ul className="list-disc list-inside text-slate-700 space-y-2">
-            <li>역사적 사료에 대한 체계적인 연구와 학습</li>
-            <li>민간 차원의 올바른 역사 교류</li>
-            <li>동아시아의 평화적 관계 형성을 위한 관점 전환</li>
-          </ul>
-        </div>
-      </div>
-
-      <div className="bg-white p-8 rounded-2xl shadow-lg text-center max-w-2xl mx-auto">
-        <h3 className="text-xl font-bold mb-4">미래를 위한 우리의 자세</h3>
-        <p className="text-slate-600 italic">
-          "진정한 영토 수호는 감정이 아닌 이성과 팩트(Fact)에서 시작됩니다."
-        </p>
-        <div className="mt-6">
-          <span className="inline-block bg-slate-100 px-4 py-2 rounded-full text-sm font-semibold text-slate-600">
-            #올바른_역사인식
-          </span>
-          <span className="inline-block bg-slate-100 px-4 py-2 rounded-full text-sm font-semibold text-slate-600 ml-2">
-            #동북아_평화
-          </span>
-          <span className="inline-block bg-slate-100 px-4 py-2 rounded-full text-sm font-semibold text-slate-600 ml-2">
-            #독도_사랑
-          </span>
-        </div>
-      </div>
-    </div>
-  );
-};
-
-const QuizSection = () => {
-  const [currentQuestion, setCurrentQuestion] = useState(0);
-  const [showScore, setShowScore] = useState(false);
-  const [score, setScore] = useState(0);
-  const [selectedAnswer, setSelectedAnswer] = useState(null);
-
-  const questions = [
-    {
-      question: "울릉도에서 독도까지의 거리는 얼마일까요?",
-      options: ["45.5km", "87.4km", "157.5km", "200km"],
-      answer: 1,
-      explanation: "울릉도와 독도의 거리는 87.4km입니다. 반면 일본 오키섬과의 거리는 157.5km로 훨씬 멉니다."
-    },
-    {
-      question: "1900년 대한제국 칙령 제41호에서 독도를 지칭한 이름은?",
-      options: ["우산도", "가지도", "석도", "송도"],
-      answer: 2,
-      explanation: "대한제국 칙령 제41호에는 독도를 '석도(돌섬)'라고 명시하여 울도군이 관할하도록 했습니다."
-    },
-    {
-      question: "조선 숙종 때 일본으로 건너가 독도가 조선 땅임을 확인받은 인물은?",
-      options: ["이사부", "안용복", "장보고", "이순신"],
-      answer: 1,
-      explanation: "안용복은 1693년과 1696년 두 차례 일본으로 건너가 울릉도와 독도가 조선 영토임을 강력히 주장했습니다."
-    }
-  ];
-
-  const handleAnswerClick = (idx) => {
-    setSelectedAnswer(idx);
-    if (idx === questions[currentQuestion].answer) {
-      setScore(score + 1);
-    }
-    
-    setTimeout(() => {
-      const nextQuestion = currentQuestion + 1;
-      if (nextQuestion < questions.length) {
-        setCurrentQuestion(nextQuestion);
-        setSelectedAnswer(null);
-      } else {
-        setShowScore(true);
-      }
-    }, 2000);
-  };
-
-  const resetQuiz = () => {
-    setCurrentQuestion(0);
-    setScore(0);
-    setShowScore(false);
-    setSelectedAnswer(null);
-  };
-
-  return (
-    <div className="bg-white rounded-3xl shadow-xl p-8 max-w-2xl mx-auto border border-blue-100 mt-12">
-      <div className="flex items-center gap-2 mb-6 justify-center">
-        <Award className="text-yellow-500" size={32} />
-        <h2 className="text-2xl font-bold text-slate-800">독도 미니 퀴즈</h2>
-      </div>
-
-      {showScore ? (
-        <div className="text-center space-y-6">
-          <p className="text-xl">총 {questions.length}문제 중 <span className="font-bold text-blue-600 text-3xl">{score}</span>문제를 맞추셨습니다!</p>
-          <p className="text-slate-500">독도에 대해 훌륭한 지식을 가지고 계시네요.</p>
-          <button 
-            onClick={resetQuiz}
-            className="bg-blue-600 text-white px-6 py-2 rounded-full hover:bg-blue-700 transition"
-          >
-            다시 풀기
-          </button>
-        </div>
-      ) : (
-        <div>
-          <div className="mb-4 flex justify-between text-sm text-slate-500">
-            <span>Question {currentQuestion + 1} / {questions.length}</span>
-            <span>점수: {score}</span>
-          </div>
-          <h3 className="text-xl font-bold mb-6 min-h-[3.5rem]">{questions[currentQuestion].question}</h3>
-          
-          <div className="space-y-3">
-            {questions[currentQuestion].options.map((option, idx) => {
-              let btnClass = "w-full text-left p-4 rounded-xl border-2 transition-all ";
-              if (selectedAnswer === null) {
-                btnClass += "border-slate-100 hover:border-blue-300 hover:bg-blue-50";
-              } else if (idx === questions[currentQuestion].answer) {
-                btnClass += "border-green-500 bg-green-50 text-green-700 font-bold";
-              } else if (idx === selectedAnswer) {
-                btnClass += "border-red-400 bg-red-50 text-red-700";
-              } else {
-                btnClass += "border-slate-100 opacity-50";
-              }
-
-              return (
-                <button
-                  key={idx}
-                  onClick={() => selectedAnswer === null && handleAnswerClick(idx)}
-                  className={btnClass}
-                  disabled={selectedAnswer !== null}
-                >
-                  {option}
+                <!-- Mobile Menu Button -->
+                <button class="md:hidden p-2" onclick="toggleMenu()">
+                    <i id="menu-icon" class="fas fa-bars text-xl"></i>
                 </button>
-              );
-            })}
-          </div>
-          
-          {selectedAnswer !== null && (
-            <div className="mt-6 p-4 bg-slate-50 rounded-lg text-sm text-slate-700 animate-fade-in">
-              <span className="font-bold block mb-1">해설:</span>
-              {questions[currentQuestion].explanation}
             </div>
-          )}
         </div>
-      )}
-    </div>
-  );
-};
 
-const InfoCard = ({ icon, title, description, onClick }) => (
-  <div 
-    onClick={onClick}
-    className="bg-white p-6 rounded-2xl shadow-md hover:shadow-xl transition-all cursor-pointer group border border-slate-100 hover:border-blue-200"
-  >
-    <div className="mb-4 p-3 bg-blue-50 w-fit rounded-xl group-hover:bg-blue-100 transition-colors">
-      {icon}
-    </div>
-    <h3 className="text-xl font-bold text-slate-800 mb-3 group-hover:text-blue-700 transition-colors">{title}</h3>
-    <p className="text-slate-600 text-sm leading-relaxed">{description}</p>
-  </div>
-);
+        <!-- Mobile Nav -->
+        <nav id="mobile-nav" class="hidden md:hidden bg-blue-800 px-4 py-2 space-y-2">
+            <button onclick="showSection('home')" class="w-full flex items-center space-x-2 px-4 py-3 rounded-lg text-left text-blue-100">
+                <i class="fas fa-anchor"></i><span>홈</span>
+            </button>
+            <button onclick="showSection('geography')" class="w-full flex items-center space-x-2 px-4 py-3 rounded-lg text-left text-blue-100">
+                <i class="fas fa-map"></i><span>지리적 특성</span>
+            </button>
+            <button onclick="showSection('history')" class="w-full flex items-center space-x-2 px-4 py-3 rounded-lg text-left text-blue-100">
+                <i class="fas fa-book-open"></i><span>역사와 증거</span>
+            </button>
+            <button onclick="showSection('timeline')" class="w-full flex items-center space-x-2 px-4 py-3 rounded-lg text-left text-blue-100">
+                <i class="fas fa-clock"></i><span>역사 연대기</span>
+            </button>
+            <button onclick="showSection('conflict')" class="w-full flex items-center space-x-2 px-4 py-3 rounded-lg text-left text-blue-100">
+                <i class="fas fa-shield-halved"></i><span>갈등과 화해</span>
+            </button>
+        </nav>
+    </header>
 
-export default DokdoLearningHub;
+    <!-- Main Content -->
+    <main class="container mx-auto px-4 py-8 mb-12 min-h-[70vh]">
+        
+        <!-- HOME SECTION -->
+        <section id="section-home" class="content-section space-y-12 fade-in">
+            <div class="relative rounded-3xl overflow-hidden shadow-2xl bg-blue-800 text-white h-96 flex flex-col justify-center items-center text-center p-6">
+                <div class="absolute inset-0 hero-gradient z-10"></div>
+                <div class="absolute inset-0 z-0 bg-cover bg-center opacity-40" style="background-image: url('https://images.unsplash.com/photo-1548685913-fe67375a022d?q=80&w=2070&auto=format&fit=crop');"></div>
+                
+                <div class="relative z-20 max-w-2xl">
+                    <h1 class="text-4xl md:text-6xl font-extrabold mb-4">독도, 우리의 자부심</h1>
+                    <p class="text-lg md:text-xl text-blue-100 mb-8 leading-relaxed">
+                        독도는 지리적, 역사적, 국제법적으로<br/>명백한 대한민국의 고유 영토입니다.
+                    </p>
+                    <button onclick="showSection('geography')" class="bg-yellow-400 text-blue-900 hover:bg-yellow-300 px-8 py-3 rounded-full font-bold text-lg transition-transform transform hover:scale-105 shadow-lg">
+                        독도 알아보기
+                    </button>
+                </div>
+            </div>
+
+            <div class="grid md:grid-cols-3 gap-6">
+                <div onclick="showSection('geography')" class="bg-white p-6 rounded-2xl shadow-md hover:shadow-xl transition-all cursor-pointer group border border-slate-100 hover:border-blue-200">
+                    <div class="mb-4 p-3 bg-blue-50 w-fit rounded-xl group-hover:bg-blue-100 transition-colors">
+                        <i class="fas fa-map text-blue-600 text-2xl"></i>
+                    </div>
+                    <h3 class="text-xl font-bold text-slate-800 mb-3 group-hover:text-blue-700">지리적 증거</h3>
+                    <p class="text-slate-600 text-sm leading-relaxed">울릉도에서 독도까지는 87.4km로, 맑은 날 육안으로 볼 수 있습니다. 이는 독도가 울릉도의 부속 섬임을 지리적으로 증명합니다.</p>
+                </div>
+                <div onclick="showSection('history')" class="bg-white p-6 rounded-2xl shadow-md hover:shadow-xl transition-all cursor-pointer group border border-slate-100 hover:border-blue-200">
+                    <div class="mb-4 p-3 bg-blue-50 w-fit rounded-xl group-hover:bg-blue-100 transition-colors">
+                        <i class="fas fa-book-open text-blue-600 text-2xl"></i>
+                    </div>
+                    <h3 class="text-xl font-bold text-slate-800 mb-3 group-hover:text-blue-700">역사적 기록</h3>
+                    <p class="text-slate-600 text-sm leading-relaxed">세종실록지리지, 대한제국 칙령 제41호 등 수많은 고문헌과 지도가 독도가 한국의 영토임을 기록하고 있습니다.</p>
+                </div>
+                <div onclick="showSection('conflict')" class="bg-white p-6 rounded-2xl shadow-md hover:shadow-xl transition-all cursor-pointer group border border-slate-100 hover:border-blue-200">
+                    <div class="mb-4 p-3 bg-blue-50 w-fit rounded-xl group-hover:bg-blue-100 transition-colors">
+                        <i class="fas fa-shield-halved text-blue-600 text-2xl"></i>
+                    </div>
+                    <h3 class="text-xl font-bold text-slate-800 mb-3 group-hover:text-blue-700">평화적 해결</h3>
+                    <p class="text-slate-600 text-sm leading-relaxed">감정적인 대응보다 정확한 지식과 논리를 바탕으로 독도 영유권의 정당성을 이해하는 것이 중요합니다.</p>
+                </div>
+            </div>
+
+            <!-- Quiz Section inside Home -->
+            <div id="quiz-container" class="bg-white rounded-3xl shadow-xl p-8 max-w-2xl mx-auto border border-blue-100 mt-12">
+                <div class="flex items-center gap-2 mb-6 justify-center">
+                    <i class="fas fa-award text-yellow-500 text-3xl"></i>
+                    <h2 class="text-2xl font-bold text-slate-800">독도 미니 퀴즈</h2>
+                </div>
+                <div id="quiz-content">
+                    <!-- Quiz will be injected here by JS -->
+                </div>
+            </div>
+        </section>
+
+        <!-- GEOGRAPHY SECTION -->
+        <section id="section-geography" class="content-section hidden space-y-8 fade-in">
+            <div class="text-center mb-8">
+                <h2 class="text-3xl font-bold text-slate-800 mb-2">독도의 지리적 특성</h2>
+                <p class="text-slate-600">독도는 단순한 섬이 아닌, 동해의 해상 거점이자 천연기념물입니다.</p>
+            </div>
+            <div class="grid md:grid-cols-2 gap-8">
+                <div class="bg-white rounded-2xl shadow-lg p-6 border-l-4 border-blue-500">
+                    <h3 class="text-xl font-bold mb-4 flex items-center gap-2">
+                        <i class="fas fa-location-dot text-blue-600"></i>위치와 거리
+                    </h3>
+                    <ul class="space-y-4 text-slate-700">
+                        <li class="flex justify-between items-center p-3 bg-blue-50 rounded-lg">
+                            <span>울릉도에서 거리</span>
+                            <span class="font-bold text-blue-700">87.4km</span>
+                        </li>
+                        <li class="flex justify-between items-center p-3 bg-slate-50 rounded-lg">
+                            <span>일본 오키섬에서 거리</span>
+                            <span class="font-bold text-slate-600">157.5km</span>
+                        </li>
+                    </ul>
+                    <div class="mt-4 p-4 bg-yellow-50 text-yellow-800 rounded-lg text-sm">
+                        💡 <strong>중요 포인트:</strong> 울릉도에서는 맑은 날 독도가 보이지만, 일본 오키섬에서는 보이지 않습니다. 이는 독도가 지리적으로 울릉도의 생활권에 속함을 의미합니다.
+                    </div>
+                </div>
+                <div class="bg-white rounded-2xl shadow-lg p-6 border-l-4 border-green-500">
+                    <h3 class="text-xl font-bold mb-4 flex items-center gap-2">
+                        <i class="fas fa-anchor text-green-600"></i>구성과 주소
+                    </h3>
+                    <div class="space-y-3">
+                        <p class="font-medium text-slate-800">주소: 경상북도 울릉군 울릉읍 독도리 1~96</p>
+                        <div class="grid grid-cols-2 gap-2 mt-2">
+                            <div class="bg-slate-100 p-3 rounded text-center">
+                                <span class="block font-bold text-lg">동도</span>
+                                <span class="text-xs text-slate-500">유인 등대, 경비대</span>
+                            </div>
+                            <div class="bg-slate-100 p-3 rounded text-center">
+                                <span class="block font-bold text-lg">서도</span>
+                                <span class="text-xs text-slate-500">주민 숙소</span>
+                            </div>
+                        </div>
+                        <p class="text-sm text-slate-600 mt-2">동도와 서도 외에 89개의 부속 도서로 구성되어 있으며, <strong>천연기념물 제336호</strong>로 지정되어 보호받고 있습니다.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="bg-blue-900 text-white rounded-2xl p-8 shadow-xl">
+                <h3 class="text-2xl font-bold mb-4">독도의 가치</h3>
+                <div class="grid md:grid-cols-3 gap-6">
+                    <div class="bg-white/10 p-4 rounded-xl backdrop-blur-sm">
+                        <h4 class="font-bold text-lg text-yellow-300 mb-2">경제적 가치</h4>
+                        <p class="text-sm opacity-90">북쪽의 한류와 남쪽의 난류가 만나는 '조경수역'으로 황금어장을 형성합니다. 또한 차세대 에너지원인 '메탄하이드레이트'가 매장되어 있습니다.</p>
+                    </div>
+                    <div class="bg-white/10 p-4 rounded-xl backdrop-blur-sm">
+                        <h4 class="font-bold text-lg text-green-300 mb-2">생태적 가치</h4>
+                        <p class="text-sm opacity-90">화산 활동으로 형성된 독특한 지형과 경관을 자랑하며, 다양한 철새들의 중간 기착지이자 해양 생물의 서식지입니다.</p>
+                    </div>
+                    <div class="bg-white/10 p-4 rounded-xl backdrop-blur-sm">
+                        <h4 class="font-bold text-lg text-blue-300 mb-2">군사/안보적 가치</h4>
+                        <p class="text-sm opacity-90">동해의 한가운데 위치하여 해상 및 공중 교통의 요충지이며, 기상 상황과 해양 환경을 관측하는 중요한 기지 역할을 합니다.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- HISTORY SECTION -->
+        <section id="section-history" class="content-section hidden space-y-10 fade-in">
+            <div class="text-center">
+                <h2 class="text-3xl font-bold text-slate-800 mb-2">사료와 증거</h2>
+                <p class="text-slate-600">역사적 문헌과 지도는 독도가 한국의 땅임을 명백히 보여줍니다.</p>
+            </div>
+            <div class="grid md:grid-cols-2 gap-6">
+                <div class="bg-white p-6 rounded-xl shadow-md border-t-4 border-blue-600">
+                    <h3 class="text-xl font-bold mb-3 text-blue-900">세종실록지리지 (1454년)</h3>
+                    <p class="text-slate-600 leading-relaxed">독도(우산)와 울릉도(무릉) 두 섬이 서로 거리가 멀지 않아 날씨가 맑으면 바라볼 수 있다고 기록했습니다. 이는 조선의 관찬서에서 독도를 우리 영토로 명시한 중요한 증거입니다.</p>
+                </div>
+                <div class="bg-white p-6 rounded-xl shadow-md border-t-4 border-blue-600">
+                    <h3 class="text-xl font-bold mb-3 text-blue-900">안용복 사건 (1693, 1696년)</h3>
+                    <p class="text-slate-600 leading-relaxed">조선의 어부 안용복은 일본으로 건너가 울릉도와 독도가 조선의 땅임을 주장하였고, 이에 일본 막부는 '울릉도 도해 금지령'을 내려 이를 인정했습니다.</p>
+                </div>
+                <div class="bg-white p-6 rounded-xl shadow-md border-t-4 border-blue-600">
+                    <h3 class="text-xl font-bold mb-3 text-blue-900">대한제국 칙령 제41호 (1900년)</h3>
+                    <p class="text-slate-600 leading-relaxed">고종 황제는 울릉도를 울도군으로 승격시키고, 관할 구역에 '석도(독도)'를 명시하여 근대 법령으로 독도 영유권을 세계에 공표했습니다.</p>
+                </div>
+                <div class="bg-white p-6 rounded-xl shadow-md border-t-4 border-blue-600">
+                    <h3 class="text-xl font-bold mb-3 text-blue-900">태정관 지령 (1877년)</h3>
+                    <p class="text-slate-600 leading-relaxed">일본의 최고 행정기관인 태정관이 '죽도(울릉도) 외 1도(독도)는 일본과 관계가 없다'고 내무성에 내린 지시입니다. 일본 스스로 독도가 자국 영토가 아님을 인정한 결정적 문서입니다.</p>
+                </div>
+            </div>
+            <div class="bg-slate-100 rounded-2xl p-8">
+                <h3 class="text-2xl font-bold mb-6 text-center">독도 이름의 변천사</h3>
+                <div class="grid sm:grid-cols-2 md:grid-cols-4 gap-4">
+                    <div class="bg-white p-4 rounded-lg shadow text-center">
+                        <div class="text-lg font-bold text-blue-600 mb-2">우산도 (于山島)</div>
+                        <div class="text-sm text-slate-500">삼국시대 우산국에서 유래</div>
+                    </div>
+                    <div class="bg-white p-4 rounded-lg shadow text-center">
+                        <div class="text-lg font-bold text-blue-600 mb-2">석도 (石島)</div>
+                        <div class="text-sm text-slate-500">1900년 '돌섬'의 한자 표기</div>
+                    </div>
+                    <div class="bg-white p-4 rounded-lg shadow text-center">
+                        <div class="text-lg font-bold text-blue-600 mb-2">가지도 (可支島)</div>
+                        <div class="text-sm text-slate-500">강치가 많이 사는 섬</div>
+                    </div>
+                    <div class="bg-white p-4 rounded-lg shadow text-center">
+                        <div class="text-lg font-bold text-blue-600 mb-2">독도 (獨島)</div>
+                        <div class="text-sm text-slate-500">방언 '독섬'에서 유래</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- TIMELINE SECTION -->
+        <section id="section-timeline" class="content-section hidden max-w-4xl mx-auto fade-in">
+            <div class="text-center mb-10">
+                <h2 class="text-3xl font-bold text-slate-800 mb-2">대한민국 독도 영유권의 역사</h2>
+                <p class="text-slate-600">512년 신라의 우산국 정복부터 현재에 이르기까지의 기록</p>
+            </div>
+            <div id="timeline-container" class="relative border-l-4 border-blue-200 ml-4 md:ml-0 space-y-8 pl-8 md:pl-0">
+                <!-- Timeline items will be injected by JS -->
+            </div>
+        </section>
+
+        <!-- CONFLICT SECTION -->
+        <section id="section-conflict" class="content-section hidden space-y-12 fade-in">
+            <div class="text-center">
+                <h2 class="text-3xl font-bold text-slate-800 mb-2">갈등과 화해</h2>
+                <p class="text-slate-600">올바른 역사 인식을 통한 평화적 해결을 모색합니다.</p>
+            </div>
+            <div class="grid md:grid-cols-2 gap-8">
+                <div class="bg-red-50 p-6 rounded-2xl border border-red-100">
+                    <div class="flex items-center gap-3 mb-4 text-red-900">
+                        <i class="fas fa-circle-exclamation text-2xl text-red-600"></i>
+                        <h3 class="text-xl font-bold">주요 갈등: 다케시마의 날</h3>
+                    </div>
+                    <p class="text-slate-700 mb-4">일본 시마네현은 1905년 2월 22일 독도를 불법적으로 편입한 것을 기념하여, 2005년부터 매년 2월 22일을 '다케시마의 날'로 제정해 행사를 진행하고 있습니다.</p>
+                    <p class="text-slate-700">이는 명백한 역사 왜곡이며, 대한민국의 영유권을 침해하는 행위입니다. 일본 교과서에도 독도 관련 왜곡된 기술이 증가하고 있어 양국 간의 갈등이 지속되고 있습니다.</p>
+                </div>
+                <div class="bg-blue-50 p-6 rounded-2xl border border-blue-100">
+                    <div class="flex items-center gap-3 mb-4 text-blue-900">
+                        <i class="fas fa-circle-check text-2xl text-blue-600"></i>
+                        <h3 class="text-xl font-bold">평화적 해결을 위한 노력</h3>
+                    </div>
+                    <p class="text-slate-700 mb-4">단순히 '우리 땅'이라는 감정적 대응보다는, <strong>정확한 지식과 논리</strong>를 바탕으로 독도 영유권의 정당성을 이해하는 것이 중요합니다.</p>
+                    <ul class="list-disc list-inside text-slate-700 space-y-2">
+                        <li>역사적 사료에 대한 체계적인 연구와 학습</li>
+                        <li>민간 차원의 올바른 역사 교류</li>
+                        <li>동아시아의 평화적 관계 형성을 위한 관점 전환</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="bg-white p-8 rounded-2xl shadow-lg text-center max-w-2xl mx-auto">
+                <h3 class="text-xl font-bold mb-4">미래를 위한 우리의 자세</h3>
+                <p class="text-slate-600 italic">"진정한 영토 수호는 감정이 아닌 이성과 팩트(Fact)에서 시작됩니다."</p>
+                <div class="mt-6 flex flex-wrap justify-center gap-2">
+                    <span class="inline-block bg-slate-100 px-4 py-2 rounded-full text-sm font-semibold text-slate-600">#올바른_역사인식</span>
+                    <span class="inline-block bg-slate-100 px-4 py-2 rounded-full text-sm font-semibold text-slate-600">#동북아_평화</span>
+                    <span class="inline-block bg-slate-100 px-4 py-2 rounded-full text-sm font-semibold text-slate-600">#독도_사랑</span>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-slate-800 text-slate-300 py-8">
+        <div class="container mx-auto px-4 text-center">
+            <p class="font-bold text-lg mb-2">대한민국 동쪽 땅끝, 독도</p>
+            <p class="text-sm opacity-80">경상북도 울릉군 울릉읍 독도리 1~96</p>
+            <div class="mt-4 text-xs text-slate-500">
+                ⓒ 2024 Dokdo Learning Hub. 모든 정보는 교육용 자료를 기반으로 합니다.
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // --- State Management ---
+        let currentTab = 'home';
+        let currentQuizIdx = 0;
+        let quizScore = 0;
+        let quizSelectedAnswer = null;
+
+        // --- Data ---
+        const timelineEvents = [
+            { year: "512", title: "이사부의 우산국 정복", desc: "신라 지증왕 13년, 이사부가 우산국을 복속하여 우리 역사에 편입됨." },
+            { year: "1454", title: "세종실록지리지 편찬", desc: "우산(독도)과 무릉(울릉도)이 강원도 울진현 소속임을 명시함." },
+            { year: "1693", title: "제1차 안용복 사건", desc: "안용복이 일본으로 납치되었다가 독도가 조선 땅임을 주장하고 돌아옴." },
+            { year: "1696", title: "제2차 안용복 사건", desc: "일본 막부가 '울릉도 도해 금지령'을 내려 조선 영토임을 확인." },
+            { year: "1785", title: "삼국접양지도 제작", desc: "일본 학자 하야시 시헤이가 독도를 조선과 같은 황색으로 칠하고 '조선의 것'이라 표기." },
+            { year: "1877", title: "태정관 지령", desc: "일본 최고 기관이 독도와 울릉도는 일본과 관계없음을 공식 인정." },
+            { year: "1900", title: "대한제국 칙령 제41호", desc: "독도(석도)를 울도군 관할 구역으로 명시하여 관보에 게재." },
+            { year: "1905", title: "일본의 불법 편입", desc: "러일전쟁 중 일본이 시마네현 고시 제40호를 통해 독도를 불법적으로 편입 시도." },
+            { year: "1946", title: "SCAPIN 제677호", desc: "연합국 최고사령부가 독도를 일본의 통치 및 행정 범위에서 제외함." },
+            { year: "1952", title: "평화선 선포", desc: "대한민국 정부가 인접 해양의 주권에 관한 대통령 선언(평화선)을 발표." },
+        ];
+
+        const quizData = [
+            {
+                question: "울릉도에서 독도까지의 거리는 얼마일까요?",
+                options: ["45.5km", "87.4km", "157.5km", "200km"],
+                answer: 1,
+                explanation: "울릉도와 독도의 거리는 87.4km입니다. 반면 일본 오키섬과의 거리는 157.5km로 훨씬 멉니다."
+            },
+            {
+                question: "1900년 대한제국 칙령 제41호에서 독도를 지칭한 이름은?",
+                options: ["우산도", "가지도", "석도", "송도"],
+                answer: 2,
+                explanation: "대한제국 칙령 제41호에는 독도를 '석도(돌섬)'라고 명시하여 울도군이 관할하도록 했습니다."
+            },
+            {
+                question: "조선 숙종 때 일본으로 건너가 독도가 조선 땅임을 확인받은 인물은?",
+                options: ["이사부", "안용복", "장보고", "이순신"],
+                answer: 1,
+                explanation: "안용복은 1693년과 1696년 두 차례 일본으로 건너가 울릉도와 독도가 조선 영토임을 강력히 주장했습니다."
+            }
+        ];
+
+        // --- Core Functions ---
+        function showSection(id) {
+            // Hide all sections
+            document.querySelectorAll('.content-section').forEach(sec => sec.classList.add('hidden'));
+            // Show target section
+            document.getElementById(`section-${id}`).classList.remove('hidden');
+            
+            // Update Nav Buttons
+            document.querySelectorAll('.nav-btn').forEach(btn => {
+                if(btn.dataset.id === id) {
+                    btn.classList.add('bg-blue-700', 'text-white', 'shadow-md');
+                    btn.classList.remove('text-blue-100', 'hover:bg-blue-800');
+                } else {
+                    btn.classList.remove('bg-blue-700', 'text-white', 'shadow-md');
+                    btn.classList.add('text-blue-100', 'hover:bg-blue-800');
+                }
+            });
+
+            currentTab = id;
+            window.scrollTo(0, 0);
+            if(document.getElementById('mobile-nav').classList.contains('block')) toggleMenu();
+        }
+
+        function toggleMenu() {
+            const nav = document.getElementById('mobile-nav');
+            const icon = document.getElementById('menu-icon');
+            if(nav.classList.contains('hidden')) {
+                nav.classList.remove('hidden');
+                nav.classList.add('block');
+                icon.classList.replace('fa-bars', 'fa-xmark');
+            } else {
+                nav.classList.add('hidden');
+                nav.classList.remove('block');
+                icon.classList.replace('fa-xmark', 'fa-bars');
+            }
+        }
+
+        // --- Timeline Generation ---
+        function renderTimeline() {
+            const container = document.getElementById('timeline-container');
+            container.innerHTML = timelineEvents.map(event => `
+                <div class="relative md:flex items-start group">
+                    <div class="timeline-dot absolute -left-[3.25rem] md:left-auto md:absolute md:left-1/2 md:-ml-3 mt-1.5 w-6 h-6 rounded-full border-4 border-white bg-blue-500 shadow-md z-10"></div>
+                    <div class="hidden md:block w-1/2 pr-12 text-right">
+                        <span class="text-2xl font-bold text-blue-600 block">${event.year}</span>
+                    </div>
+                    <div class="w-full md:w-1/2 md:pl-12">
+                        <div class="md:hidden text-xl font-bold text-blue-600 mb-1">${event.year}</div>
+                        <div class="bg-white p-5 rounded-xl shadow-sm border border-slate-100 group-hover:shadow-md transition-shadow">
+                            <h3 class="font-bold text-lg text-slate-800 mb-2">${event.title}</h3>
+                            <p class="text-slate-600 text-sm">${event.desc}</p>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // --- Quiz Logic ---
+        function renderQuiz() {
+            const container = document.getElementById('quiz-content');
+            if(currentQuizIdx >= quizData.length) {
+                renderScore(container);
+                return;
+            }
+
+            const q = quizData[currentQuizIdx];
+            container.innerHTML = `
+                <div class="fade-in">
+                    <div class="mb-4 flex justify-between text-sm text-slate-500">
+                        <span>Question ${currentQuizIdx + 1} / ${quizData.length}</span>
+                        <span>점수: ${quizScore}</span>
+                    </div>
+                    <h3 class="text-xl font-bold mb-6 min-h-[3.5rem]">${q.question}</h3>
+                    <div class="space-y-3">
+                        ${q.options.map((opt, idx) => `
+                            <button onclick="handleQuizAnswer(${idx})" id="quiz-opt-${idx}" class="quiz-opt w-full text-left p-4 rounded-xl border-2 border-slate-100 hover:border-blue-300 hover:bg-blue-50 transition-all">
+                                ${opt}
+                            </button>
+                        `).join('')}
+                    </div>
+                    <div id="quiz-explanation" class="hidden mt-6 p-4 bg-slate-50 rounded-lg text-sm text-slate-700 animate-fade-in">
+                        <span class="font-bold block mb-1">해설:</span>
+                        ${q.explanation}
+                    </div>
+                </div>
+            `;
+        }
+
+        function handleQuizAnswer(idx) {
+            if (quizSelectedAnswer !== null) return;
+            quizSelectedAnswer = idx;
+            const q = quizData[currentQuizIdx];
+            const isCorrect = idx === q.answer;
+            
+            if(isCorrect) quizScore++;
+            
+            // Visual feedback
+            const options = document.querySelectorAll('.quiz-opt');
+            options.forEach((btn, i) => {
+                btn.classList.add('opacity-50');
+                if(i === q.answer) {
+                    btn.classList.replace('border-slate-100', 'border-green-500');
+                    btn.classList.add('bg-green-50', 'text-green-700', 'font-bold');
+                } else if(i === idx) {
+                    btn.classList.replace('border-slate-100', 'border-red-400');
+                    btn.classList.add('bg-red-50', 'text-red-700');
+                }
+            });
+
+            document.getElementById('quiz-explanation').classList.remove('hidden');
+
+            setTimeout(() => {
+                currentQuizIdx++;
+                quizSelectedAnswer = null;
+                renderQuiz();
+            }, 2500);
+        }
+
+        function renderScore(container) {
+            container.innerHTML = `
+                <div class="text-center space-y-6 fade-in">
+                    <p class="text-xl">총 ${quizData.length}문제 중 <span class="font-bold text-blue-600 text-3xl">${quizScore}</span>문제를 맞추셨습니다!</p>
+                    <p class="text-slate-500">독도에 대해 훌륭한 지식을 가지고 계시네요.</p>
+                    <button onclick="resetQuiz()" class="bg-blue-600 text-white px-6 py-2 rounded-full hover:bg-blue-700 transition">
+                        다시 풀기
+                    </button>
+                </div>
+            `;
+        }
+
+        function resetQuiz() {
+            currentQuizIdx = 0;
+            quizScore = 0;
+            quizSelectedAnswer = null;
+            renderQuiz();
+        }
+
+        // Init
+        window.onload = () => {
+            renderTimeline();
+            renderQuiz();
+        };
+    </script>
+</body>
+</html>
