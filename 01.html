@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>독도 역사 연표 - 대한민국 독도</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- React & ReactDOM -->
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <!-- Babel for JSX -->
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <!-- Noto Sans KR Font -->
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Song+Myung&display=swap" rel="stylesheet">
+
+    <style>
+        body {
+            font-family: 'Noto Sans KR', sans-serif;
+        }
+        .font-serif-kr {
+            font-family: 'Song Myung', serif;
+        }
+        /* Custom Animations */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .animate-fade-in { animation: fadeIn 0.6s ease-out forwards; }
+    </style>
+</head>
+<body>
+    <div id="root"></div>
+
+    <script type="text/babel" data-presets="react">
+        // --- 아이콘 컴포넌트 직접 정의 (오류 해결) ---
+        const IconBase = ({ children, size = 24, className = "", ...props }) => (
+            <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width={size}
+                height={size}
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                className={className}
+                {...props}
+            >
+                {children}
+            </svg>
+        );
+
+        const Home = (props) => (
+            <IconBase {...props}>
+                <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
+                <polyline points="9 22 9 12 15 12 15 22" />
+            </IconBase>
+        );
+
+        const History = (props) => (
+            <IconBase {...props}>
+                <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 12" />
+                <path d="M3 3v9h9" />
+            </IconBase>
+        );
+
+        const TimelinePage = () => {
+            // 타임라인 데이터 정의
+            const timelineData = [
+                {
+                    era: "15세기 ~ 17세기 (조선 전기 ~ 중기)",
+                    color: "bg-blue-100 text-blue-800 border-blue-200",
+                    events: [
+                        { year: "1454", title: "세종실록지리지", desc: "우산(독도)과 무릉(울릉도)이 강원도 울진현에 속한다고 기록함." },
+                        { year: "1531", title: "신증동국여지승람", desc: "독도가 우리 영토임을 밝히는 관찬 지리지가 편찬됨." },
+                        { year: "1667", title: "은주시청합기 (일본 문헌)", desc: "울릉도와 독도가 일본 영토 밖(조선 땅)임을 기록한 일본의 보고서." },
+                        { year: "1693", title: "1차 안용복 사건", desc: "안용복이 일본으로 끌려가 독도가 조선 땅임을 강력히 주장함." },
+                        { year: "1696", title: "2차 안용복 사건", desc: "안용복이 일본에 건너가 불법 침범에 항의하자, 일본 막부가 '울릉도 도해 금지령'을 내림." }
+                    ]
+                },
+                {
+                    era: "18세기 ~ 19세기 (조선 후기 ~ 대한제국)",
+                    color: "bg-emerald-100 text-emerald-800 border-emerald-200",
+                    events: [
+                        { year: "1785", title: "삼국접양지도", desc: "일본 하야시 시헤이가 제작. 독도를 조선색(황색)으로 칠하고 '조선의 것'이라 표기함." },
+                        { year: "1877", title: "태정관 지령", desc: "일본 최고 행정기관이 \"독도와 울릉도는 일본과 관계없다\"고 공식 인정함." },
+                        { year: "1900", title: "대한제국 칙령 41호", desc: "고종 황제가 독도를 울릉군의 관할 구역으로 공식 반포함." }
+                    ]
+                },
+                {
+                    era: "20세기 (일제강점기 ~ 광복 이후)",
+                    color: "bg-amber-100 text-amber-800 border-amber-200",
+                    events: [
+                        { year: "1905", title: "시마네현 고시 40호", desc: "일본이 러일전쟁 중 독도를 불법적으로 '다케시마'로 편입함." },
+                        { year: "1906", title: "심흥택 보고서", desc: "울릉군수 심흥택이 독도가 일본에 편입되었다는 소식을 듣고 중앙 정부에 보고함." },
+                        { year: "1946", title: "SCAPIN 제677호", desc: "연합군최고사령관 지령으로 독도를 일본의 통치권에서 제외함." },
+                        { year: "1951", title: "샌프란시스코 강화조약", desc: "일본이 한국의 독립을 인정했으나, 독도 명시 누락으로 분쟁의 씨앗이 됨." },
+                        { year: "1952", title: "평화선 선포", desc: "이승만 대통령이 독도를 포함한 인접 해양 주권을 선언함." },
+                        { year: "1953", title: "독도의용수비대 활동", desc: "홍순칠 등 민간인들이 독도에 상주하며 일본의 침범을 막음." },
+                        { year: "1965", title: "한일기본조약", desc: "독도 문제를 언급하지 않고 봉합함 (이후 갈등 잠복)." },
+                        { year: "1998", title: "신한일어업협정", desc: "독도가 한일 중간수역에 포함되며 논란이 발생함." }
+                    ]
+                },
+                {
+                    era: "21세기 (현대)",
+                    color: "bg-indigo-100 text-indigo-800 border-indigo-200",
+                    events: [
+                        { year: "2005", title: "다케시마의 날 제정", desc: "일본 시마네현이 2월 22일을 '다케시마의 날'로 제정함." },
+                        { year: "2011", title: "일본 교과서 왜곡", desc: "일본 중학교 교과서 14종에 독도 영유권 주장이 기술됨." }
+                    ]
+                }
+            ];
+
+            return (
+                <div className="min-h-screen bg-slate-50 text-slate-800">
+                    {/* Header */}
+                    <header className="sticky top-0 z-50 bg-blue-900 text-white shadow-lg">
+                        <div className="container mx-auto px-4 py-4 flex justify-between items-center">
+                            <div className="flex items-center space-x-2">
+                                <History size={24} className="text-yellow-400" />
+                                <span className="text-xl md:text-2xl font-bold tracking-tight">독도 역사 연표</span>
+                            </div>
+
+                            {/* Home Button (Linked to index.html) */}
+                            <a
+                                href="index.html"
+                                className="flex items-center gap-2 px-3 py-2 bg-blue-800 hover:bg-blue-700 rounded-lg transition-colors text-blue-100 hover:text-white"
+                                title="메인으로 돌아가기"
+                            >
+                                <span className="hidden md:inline text-sm font-medium">메인으로</span>
+                                <Home size={20} />
+                            </a>
+                        </div>
+                    </header>
+
+                    {/* Main Content */}
+                    <main className="container mx-auto px-4 py-12 max-w-4xl">
+
+                        <div className="text-center mb-16 animate-fade-in">
+                            <h1 className="text-3xl md:text-4xl font-serif-kr font-bold text-slate-900 mb-4">
+                                독도 관련 주요 역사적 사실
+                            </h1>
+                            <p className="text-lg text-slate-600">
+                                역사의 흐름 속에서 지켜온 우리 땅 독도의 기록을 시대별로 정리했습니다.
+                            </p>
+                        </div>
+
+                        <div className="space-y-16">
+                            {timelineData.map((eraData, eraIndex) => (
+                                <section key={eraIndex} className="animate-fade-in" style={{animationDelay: `${eraIndex * 0.1}s`}}>
+
+                                    {/* Era Header */}
+                                    <div className={`sticky top-20 z-10 py-3 px-6 rounded-full inline-block font-bold text-lg mb-8 shadow-sm border ${eraData.color}`}>
+                                        {eraData.era}
+                                    </div>
+
+                                    {/* Events List */}
+                                    <div className="relative border-l-4 border-slate-200 ml-4 md:ml-6 space-y-10 pl-8 md:pl-10 pb-4">
+                                        {eraData.events.map((event, eventIndex) => (
+                                            <div key={eventIndex} className="relative group">
+                                                {/* Dot on the timeline */}
+                                                <div className="absolute -left-[2.85rem] md:-left-[3.35rem] mt-1.5 w-5 h-5 rounded-full border-4 border-white bg-slate-400 group-hover:bg-blue-600 transition-colors shadow-sm"></div>
+
+                                                <div className="bg-white p-6 rounded-xl shadow-sm border border-slate-100 hover:shadow-md transition-all hover:-translate-y-1">
+                                                    <div className="flex flex-col md:flex-row md:items-baseline gap-2 md:gap-4 mb-2">
+                                                        <span className="text-2xl font-black text-blue-900 font-serif-kr shrink-0">
+                                                            {event.year}
+                                                        </span>
+                                                        <h3 className="text-lg font-bold text-slate-800">
+                                                            {event.title}
+                                                        </h3>
+                                                    </div>
+                                                    <p className="text-slate-600 leading-relaxed">
+                                                        {event.desc}
+                                                    </p>
+                                                </div>
+                                            </div>
+                                        ))}
+                                    </div>
+                                </section>
+                            ))}
+                        </div>
+
+                        {/* Bottom Navigation */}
+                        <div className="mt-20 pt-10 border-t border-slate-200 text-center">
+                            <p className="text-slate-500 mb-6">독도에 대한 더 많은 정보가 궁금하다면?</p>
+                            <a
+                                href="index.html"
+                                className="inline-flex items-center gap-2 bg-blue-600 text-white px-8 py-3 rounded-full hover:bg-blue-700 transition-colors font-bold shadow-lg hover:shadow-xl transform hover:-translate-y-0.5"
+                            >
+                                <Home size={20} />
+                                독도 바로 알기 메인으로 이동
+                            </a>
+                        </div>
+
+                    </main>
+
+                    {/* Footer */}
+                    <footer className="bg-slate-800 text-slate-400 py-8 mt-12">
+                        <div className="container mx-auto px-4 text-center text-sm">
+                            <p>&copy; 2024 Dokdo History Timeline. All rights reserved.</p>
+                            <p className="mt-2 text-slate-500">Provided educational materials based.</p>
+                        </div>
+                    </footer>
+                </div>
+            );
+        };
+
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<TimelinePage />);
+    </script>
+</body>
+</html>
