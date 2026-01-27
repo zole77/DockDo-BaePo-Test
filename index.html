@@ -4,14 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>대한민국 독도 - 우리 땅 독도 바로 알기</title>
-    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- React & ReactDOM -->
     <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
     <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
-    <!-- Babel for JSX -->
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
-    <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&family=Song+Myung&display=swap" rel="stylesheet">
 
     <style>
@@ -34,6 +30,22 @@
             to { opacity: 1; transform: translateY(0); }
         }
         .animate-up { animation: fadeInUp 0.8s ease-out forwards; }
+        
+        /* 로딩 애니메이션 */
+        .loader {
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #3498db;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            animation: spin 1s linear infinite;
+            display: inline-block;
+            margin-right: 8px;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
     </style>
 </head>
 <body class="bg-white">
@@ -59,6 +71,11 @@
 
         const App = () => {
             const [isScrolled, setIsScrolled] = useState(false);
+            const [formData, setFormData] = useState({ author: '', content: '' });
+            const [status, setStatus] = useState('idle'); // idle, sending, success, error
+
+            // 보내주신 앱스 스크립트 URL
+            const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwUMtWt3YGIqOodv38Eigq1JwZ4v2X1NBpTX2k-hcQxL29f3ivUi2XTx1EmHlB76sA/exec";
 
             useEffect(() => {
                 const handleScroll = () => setIsScrolled(window.scrollY > 50);
@@ -66,32 +83,30 @@
                 return () => window.removeEventListener('scroll', handleScroll);
             }, []);
 
-            const menuCards = [
-                { 
-                    title: "독도 역사 연표", 
-                    desc: "고대 문헌부터 현대에 이르기까지, 기록이 증명하는 우리 땅 독도의 발자취를 확인하세요.", 
-                    icon: "history", 
-                    link: "01.html", 
-                    tag: "역사",
-                    color: "from-blue-600 to-blue-800"
-                },
-                { 
-                    title: "독도 내용 정리", 
-                    desc: "지리적 위치, 영유권의 근거, 풍부한 해양 생태계 등 독도의 핵심 정보를 정리했습니다.", 
-                    icon: "info", 
-                    link: "03.html", 
-                    tag: "정보",
-                    color: "from-teal-500 to-teal-700"
-                },
-                { 
-                    title: "문의 및 의견", 
-                    desc: "독도 캠페인에 대한 궁금한 점이나 소중한 의견을 남겨주세요. 함께 소통합니다.", 
-                    icon: "mail", 
-                    link: "https://script.google.com/macros/s/AKfycbxaE9SQrKTO6spaZ6qxdIZFW-pNEUo480eklHkQdwtkkpVOTxi3gAUf_-uLEJAmKyI/exec", 
-                    tag: "소통",
-                    color: "from-slate-700 to-slate-900"
+            const handleSubmit = async (e) => {
+                e.preventDefault();
+                setStatus('sending');
+
+                try {
+                    // 구글 앱스 스크립트로 데이터 전송
+                    await fetch(SCRIPT_URL, {
+                        method: 'POST',
+                        mode: 'no-cors', // CORS 정책 우회
+                        cache: 'no-cache',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(formData)
+                    });
+
+                    setStatus('success');
+                    setFormData({ author: '', content: '' }); // 폼 초기화
+                    
+                    // 3초 후 메시지 숨김
+                    setTimeout(() => setStatus('idle'), 3000);
+                } catch (error) {
+                    console.error("Error!", error.message);
+                    setStatus('error');
                 }
-            ];
+            };
 
             return (
                 <div className="min-h-screen flex flex-col">
@@ -104,7 +119,7 @@
                             <div className="hidden md:flex gap-8 text-sm font-bold uppercase tracking-widest">
                                 <a href="01.html" className={`${isScrolled ? 'text-slate-600 hover:text-blue-600' : 'text-slate-200 hover:text-white'} transition-colors`}>Timeline</a>
                                 <a href="03.html" className={`${isScrolled ? 'text-slate-600 hover:text-blue-600' : 'text-slate-200 hover:text-white'} transition-colors`}>Information</a>
-                                <a href="https://script.google.com/macros/s/AKfycbxaE9SQrKTO6spaZ6qxdIZFW-pNEUo480eklHkQdwtkkpVOTxi3gAUf_-uLEJAmKyI/exec" className={`${isScrolled ? 'text-slate-600 hover:text-blue-600' : 'text-slate-200 hover:text-white'} transition-colors`}>Contact</a>
+                                <a href="#contact" className={`${isScrolled ? 'text-slate-600 hover:text-blue-600' : 'text-slate-200 hover:text-white'} transition-colors`}>Contact</a>
                             </div>
                         </div>
                     </nav>
@@ -126,8 +141,8 @@
                                 <a href="#explore" className="bg-blue-600 hover:bg-blue-700 text-white px-10 py-5 rounded-full font-bold transition-all transform hover:-translate-y-1 shadow-2xl">
                                     독도 탐색하기
                                 </a>
-                                <a href="03.html" className="bg-white/10 hover:bg-white/20 backdrop-blur-md text-white border border-white/30 px-10 py-5 rounded-full font-bold transition-all">
-                                    상세 정보 보기
+                                <a href="#contact" className="bg-white/10 hover:bg-white/20 backdrop-blur-md text-white border border-white/30 px-10 py-5 rounded-full font-bold transition-all">
+                                    의견 남기기
                                 </a>
                             </div>
                         </div>
@@ -138,83 +153,134 @@
                         <div className="container mx-auto px-6">
                             <div className="max-w-xl mx-auto text-center mb-20">
                                 <h2 className="text-4xl font-serif-kr font-bold text-slate-900 mb-6">독도 바로 알기 가이드</h2>
-                                <p className="text-slate-500 leading-relaxed">아래 메뉴를 통해 독도의 역사, 지리적 특징 및 다양한 교육 자료를 확인하고 문의하실 수 있습니다.</p>
+                                <p className="text-slate-500 leading-relaxed">아래 메뉴를 통해 독도의 역사와 지리적 가치를 확인하고 궁금한 점을 문의하실 수 있습니다.</p>
                                 <div className="w-12 h-1 bg-blue-600 mx-auto mt-8"></div>
                             </div>
 
                             <div className="grid lg:grid-cols-3 gap-10">
-                                {menuCards.map((card, idx) => (
-                                    <a 
-                                        key={idx} 
-                                        href={card.link} 
-                                        className="group relative bg-white rounded-[2.5rem] overflow-hidden shadow-sm hover:shadow-2xl transition-all duration-500 border border-slate-100 flex flex-col h-full"
-                                    >
-                                        <div className={`h-2 w-full bg-gradient-to-r ${card.color}`}></div>
-                                        <div className="p-12 flex flex-col h-full">
-                                            <div className="flex justify-between items-start mb-10">
-                                                <div className="p-4 bg-slate-50 rounded-2xl group-hover:bg-blue-50 transition-colors">
-                                                    <Icon name={card.icon} size={32} className="text-slate-700 group-hover:text-blue-600 transition-colors" />
-                                                </div>
-                                                <span className="text-[10px] font-bold uppercase tracking-widest text-slate-400 py-1 px-3 border border-slate-200 rounded-full">{card.tag}</span>
+                                {/* 역사 카드 */}
+                                <a href="01.html" className="group relative bg-white rounded-[2.5rem] overflow-hidden shadow-sm hover:shadow-2xl transition-all duration-500 border border-slate-100 flex flex-col h-full">
+                                    <div className="h-2 w-full bg-gradient-to-r from-blue-600 to-blue-800"></div>
+                                    <div className="p-12 flex flex-col h-full">
+                                        <div className="flex justify-between items-start mb-10">
+                                            <div className="p-4 bg-slate-50 rounded-2xl group-hover:bg-blue-50 transition-colors">
+                                                <Icon name="history" size={32} className="text-slate-700 group-hover:text-blue-600 transition-colors" />
                                             </div>
-                                            <h3 className="text-2xl font-bold text-slate-900 mb-5">{card.title}</h3>
-                                            <p className="text-slate-500 leading-loose mb-10 flex-grow">
-                                                {card.desc}
-                                            </p>
-                                            <div className="flex items-center text-sm font-black text-blue-600 group-hover:gap-4 gap-2 transition-all">
-                                                EXPLORE MORE <Icon name="arrow" size={16} />
-                                            </div>
+                                            <span className="text-[10px] font-bold uppercase tracking-widest text-slate-400 py-1 px-3 border border-slate-200 rounded-full">역사</span>
                                         </div>
-                                    </a>
-                                ))}
+                                        <h3 className="text-2xl font-bold text-slate-900 mb-5">독도 역사 연표</h3>
+                                        <p className="text-slate-500 leading-loose mb-10 flex-grow">고대 문헌부터 현대에 이르기까지, 기록이 증명하는 우리 땅 독도의 발자취를 확인하세요.</p>
+                                        <div className="flex items-center text-sm font-black text-blue-600 group-hover:gap-4 gap-2 transition-all">
+                                            VIEW TIMELINE <Icon name="arrow" size={16} />
+                                        </div>
+                                    </div>
+                                </a>
+
+                                {/* 정보 카드 */}
+                                <a href="03.html" className="group relative bg-white rounded-[2.5rem] overflow-hidden shadow-sm hover:shadow-2xl transition-all duration-500 border border-slate-100 flex flex-col h-full">
+                                    <div className="h-2 w-full bg-gradient-to-r from-teal-500 to-teal-700"></div>
+                                    <div className="p-12 flex flex-col h-full">
+                                        <div className="flex justify-between items-start mb-10">
+                                            <div className="p-4 bg-slate-50 rounded-2xl group-hover:bg-teal-50 transition-colors">
+                                                <Icon name="info" size={32} className="text-slate-700 group-hover:text-teal-600 transition-colors" />
+                                            </div>
+                                            <span className="text-[10px] font-bold uppercase tracking-widest text-slate-400 py-1 px-3 border border-slate-200 rounded-full">정보</span>
+                                        </div>
+                                        <h3 className="text-2xl font-bold text-slate-900 mb-5">독도 내용 정리</h3>
+                                        <p className="text-slate-500 leading-loose mb-10 flex-grow">지리적 위치, 영유권의 근거, 풍부한 해양 생태계 등 독도의 핵심 정보를 정리했습니다.</p>
+                                        <div className="flex items-center text-sm font-black text-teal-600 group-hover:gap-4 gap-2 transition-all">
+                                            VIEW INFO <Icon name="arrow" size={16} />
+                                        </div>
+                                    </div>
+                                </a>
+
+                                {/* 문의 카드 (클릭 시 폼으로 이동) */}
+                                <a href="#contact" className="group relative bg-white rounded-[2.5rem] overflow-hidden shadow-sm hover:shadow-2xl transition-all duration-500 border border-slate-100 flex flex-col h-full">
+                                    <div className="h-2 w-full bg-gradient-to-r from-slate-700 to-slate-900"></div>
+                                    <div className="p-12 flex flex-col h-full">
+                                        <div className="flex justify-between items-start mb-10">
+                                            <div className="p-4 bg-slate-50 rounded-2xl group-hover:bg-slate-200 transition-colors">
+                                                <Icon name="mail" size={32} className="text-slate-700 group-hover:text-slate-900 transition-colors" />
+                                            </div>
+                                            <span className="text-[10px] font-bold uppercase tracking-widest text-slate-400 py-1 px-3 border border-slate-200 rounded-full">소통</span>
+                                        </div>
+                                        <h3 className="text-2xl font-bold text-slate-900 mb-5">문의 및 의견</h3>
+                                        <p className="text-slate-500 leading-loose mb-10 flex-grow">독도 캠페인에 대한 궁금한 점이나 소중한 의견을 남겨주세요. 실시간으로 시트에 저장됩니다.</p>
+                                        <div className="flex items-center text-sm font-black text-slate-900 group-hover:gap-4 gap-2 transition-all">
+                                            SEND MESSAGE <Icon name="arrow" size={16} />
+                                        </div>
+                                    </div>
+                                </a>
                             </div>
                         </div>
                     </section>
 
-                    {/* Banner Quote */}
-                    <section className="py-24 bg-white">
-                        <div className="container mx-auto px-6 text-center">
-                            <div className="inline-block p-10 bg-blue-50 rounded-[3rem] border border-blue-100">
-                                <p className="text-2xl md:text-3xl font-serif-kr text-blue-900 leading-relaxed mb-4">
-                                    "우리의 관심이 독도를 지키는 가장 큰 방패입니다."
-                                </p>
-                                <p className="text-blue-600/60 font-medium">대한민국의 소중한 유산, 함께 알아가고 함께 지켜냅시다.</p>
+                    {/* Contact Section (실제 문의 폼) */}
+                    <section id="contact" className="py-32 bg-white">
+                        <div className="container mx-auto px-6 max-w-2xl">
+                            <div className="text-center mb-12">
+                                <h2 className="text-4xl font-serif-kr font-bold text-slate-900 mb-4">여러분의 의견을 들려주세요</h2>
+                                <p className="text-slate-500">남겨주신 소중한 의견은 구글 스프레드시트에 기록됩니다.</p>
                             </div>
+
+                            <form onSubmit={handleSubmit} className="bg-slate-50 p-8 md:p-12 rounded-[3rem] border border-slate-100 shadow-xl">
+                                <div className="mb-6">
+                                    <label className="block text-sm font-bold text-slate-700 mb-2 ml-1">작성자</label>
+                                    <input 
+                                        type="text" 
+                                        required
+                                        className="w-full px-6 py-4 rounded-2xl border-none ring-1 ring-slate-200 focus:ring-2 focus:ring-blue-500 outline-none transition-all"
+                                        placeholder="성함 혹은 닉네임을 입력하세요"
+                                        value={formData.author}
+                                        onChange={(e) => setFormData({...formData, author: e.target.value})}
+                                    />
+                                </div>
+                                <div className="mb-8">
+                                    <label className="block text-sm font-bold text-slate-700 mb-2 ml-1">의견 내용</label>
+                                    <textarea 
+                                        required
+                                        rows="5"
+                                        className="w-full px-6 py-4 rounded-2xl border-none ring-1 ring-slate-200 focus:ring-2 focus:ring-blue-500 outline-none transition-all"
+                                        placeholder="독도에 대해 전하고 싶은 메시지를 적어주세요"
+                                        value={formData.content}
+                                        onChange={(e) => setFormData({...formData, content: e.target.value})}
+                                    ></textarea>
+                                </div>
+
+                                <button 
+                                    type="submit"
+                                    disabled={status === 'sending'}
+                                    className={`w-full py-5 rounded-2xl font-bold text-white transition-all transform hover:-translate-y-1 shadow-lg flex justify-center items-center ${status === 'sending' ? 'bg-slate-400 cursor-not-allowed' : 'bg-blue-600 hover:bg-blue-700'}`}
+                                >
+                                    {status === 'sending' && <span className="loader"></span>}
+                                    {status === 'sending' ? '전송 중...' : '의견 보내기'}
+                                </button>
+
+                                {/* 알림 메시지 */}
+                                {status === 'success' && (
+                                    <div className="mt-4 p-4 bg-blue-50 text-blue-700 text-center font-bold rounded-xl animate-up">
+                                        성공적으로 전송되었습니다!
+                                    </div>
+                                )}
+                                {status === 'error' && (
+                                    <div className="mt-4 p-4 bg-red-50 text-red-700 text-center font-bold rounded-xl animate-up">
+                                        오류가 발생했습니다. 잠시 후 다시 시도해 주세요.
+                                    </div>
+                                )}
+                            </form>
                         </div>
                     </section>
 
                     {/* Footer */}
                     <footer className="bg-slate-900 text-slate-400 py-20">
-                        <div className="container mx-auto px-6">
-                            <div className="grid md:grid-cols-2 gap-12 items-center">
-                                <div>
-                                    <h2 className="text-white text-2xl font-black tracking-tighter mb-4">DOKDO<span className="text-blue-500">.</span></h2>
-                                    <p className="max-w-sm text-sm leading-loose">
-                                        독도의 역사와 지리적 가치를 보존하고 널리 알리기 위한 비영리 교육 프로젝트 페이지입니다. 
-                                        올바른 정보 공유를 통해 우리 영토의 소중함을 되새깁니다.
-                                    </p>
-                                </div>
-                                <div className="flex flex-wrap gap-x-12 gap-y-4 md:justify-end">
-                                    <div className="flex flex-col gap-3">
-                                        <span className="text-white font-bold text-xs uppercase tracking-widest mb-2">Sections</span>
-                                        <a href="01.html" className="hover:text-white transition-colors">역사 연표</a>
-                                        <a href="03.html" className="hover:text-white transition-colors">핵심 정리</a>
-                                        <a href="04.html" className="hover:text-white transition-colors">문의하기</a>
-                                    </div>
-                                    <div className="flex flex-col gap-3">
-                                        <span className="text-white font-bold text-xs uppercase tracking-widest mb-2">Social</span>
-                                        <a href="#" className="hover:text-white transition-colors">Instagram</a>
-                                        <a href="#" className="hover:text-white transition-colors">YouTube</a>
-                                    </div>
-                                </div>
-                            </div>
-                            <div className="mt-20 pt-8 border-t border-slate-800 flex flex-col md:flex-row justify-between items-center gap-4 text-[10px] font-medium tracking-widest uppercase">
-                                <p>&copy; 2026 Republic of Korea Dokdo Campaign. All rights reserved.</p>
-                                <div className="flex gap-6">
-                                    <a href="#" className="hover:text-white">Privacy Policy</a>
-                                    <a href="#" className="hover:text-white">Terms of Use</a>
-                                </div>
-                            </div>
+                        <div className="container mx-auto px-6 text-center">
+                            <h2 className="text-white text-2xl font-black tracking-tighter mb-4">DOKDO<span className="text-blue-500">.</span></h2>
+                            <p className="max-w-md mx-auto text-sm leading-loose mb-8">
+                                독도의 역사와 지리적 가치를 보존하기 위한 비영리 프로젝트입니다. 
+                            </p>
+                            <p className="text-[10px] font-medium tracking-widest uppercase">
+                                &copy; 2026 Republic of Korea Dokdo Campaign. All rights reserved.
+                            </p>
                         </div>
                     </footer>
                 </div>
